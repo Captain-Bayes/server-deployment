@@ -1,0 +1,22 @@
+version: "3"
+services:
+  pluto-bind-server:
+    image: ghcr.io/captain-bayes/pluto-server:latest
+    expose:
+      - "1234"
+  reverse-proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/ssl_keys:/etc/ssl_keys:ro
+      - ./nginx_templates:/etc/nginx/templates
+    environment:
+      - PLUTO_SERVER_NAME=pluto-bayes.tugraz.at
+  watchtower:  # or update images manually
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json
+    command: --interval 300 --cleanup
